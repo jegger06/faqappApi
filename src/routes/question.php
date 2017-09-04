@@ -1,5 +1,9 @@
 <?php
 
+header('Access-Control-Allow-Origin: *');
+header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
@@ -7,7 +11,7 @@ $app = new \Slim\App;
 
 // Get all on `tbl_question`
 $app->get('/api/questions', function( Request $request, Response $response ){
-	$sql = "SELECT * FROM `tbl_question`";
+	$sql = "SELECT * FROM `tbl_question` ORDER BY id DESC";
 
 	try{
 		$db = new db();
@@ -47,11 +51,11 @@ $app->get('/api/question/{id}', function( Request $request, Response $response )
 
 // Add single question
 $app->post('/api/question/add', function( Request $request, Response $response ){
-	$question = $request->getParam('question');
+	$question = $request->getParam('text');
 	$answer = $request->getParam('answer');
 	$hide = $request->getParam('hide');
 
-	$sql = "INSERT INTO `tbl_question` (question, answer, hide) VALUES (:question, :answer, :hide) ";
+	$sql = "INSERT INTO `tbl_question` (`text`, `answer`, `hide`) VALUES (:text, :answer, :hide) ";
 
 	try{
 		$db = new db();
@@ -59,7 +63,7 @@ $app->post('/api/question/add', function( Request $request, Response $response )
 		$db = $db->connect();
 
 		$stmt = $db->prepare( $sql );
-		$stmt->bindParam(':question', $question);
+		$stmt->bindParam(':text', $question);
 		$stmt->bindParam(':answer', $answer);
 		$stmt->bindParam(':hide', $hide);
 
